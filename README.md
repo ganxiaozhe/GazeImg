@@ -55,7 +55,9 @@ $('img[data-gisrc]').gazeimg();
 #### License
 
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt)
+
 Licensed GPLv3 for open source use 
+
 or GazeImg Commercial License for commercial use
 
 Copyright (c) 2020-present, JU Chengren (Ganxiaozhe)
