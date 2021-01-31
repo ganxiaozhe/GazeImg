@@ -1,6 +1,6 @@
 /* ==================================================
 // 
-// GazeImg.gQuery.css v1.0.0
+// GazeImg.gQuery.css v1.0.1
 // (c) 2020-present, JU Chengren (Ganxiaozhe)
 //
 // Licensed GPLv3 for open source use
@@ -52,6 +52,14 @@ body.gi-nobar {overflow: hidden!important;}
 .gazeimg-content.grabbing {cursor: grabbing;transition: none;}
 
 @keyframes gia-spin {0% {transform:rotate(0);}100% {transform:rotate(360deg);}}
+
+.gia-fadeIn {animation: gia-fadeIn 1s;}
+@keyframes gia-fadeIn {
+	from {transform: scale(0.9);opacity: 0;}
+	to {transform: scale(1);opacity: 1;}
+}
+
+.gia-zoomIn {animation: gia-zoomIn 0.5s;}
 @keyframes gia-zoomIn {
 	from {transform: scale(0);opacity: 0;}
 	to {transform: scale(1);opacity: 1;}

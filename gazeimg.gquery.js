@@ -1,6 +1,6 @@
 // ==================================================
 // 
-// GazeImg.gQuery.js v1.0.0
+// GazeImg.gQuery.js v1.0.1
 // (c) 2020-present, JU Chengren (Ganxiaozhe)
 //
 // Licensed GPLv3 for open source use
@@ -10,7 +10,7 @@
 ;(function($, window, document){
 	'use strict';
 	if(!$){throw new Error('GazeImg.js need gQuery: https://gquery.net/');}
-	console.log('%c GazeImg v1.0.0 %c www.gquery.net/plugins/gazeimg/ \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
+	console.log('%c GazeImg v1.0.1 %c www.gquery.net/plugins/gazeimg/ \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
 
 	let __gi = {
 		s: {close:0, move:0},
@@ -123,8 +123,10 @@
 			pos.tran.length!=6 && (pos.tran = [0,0,0,0,0,0]);
 			pos.tran = pos.tran.map(v=>parseInt(v));
 
+			this.setCapture && this.setCapture();
 			pos.evt = (e.type=='touchstart' ? 'touchmove.drag' : 'mousemove.drag');
-			$obj.addClass('grabbing').on(pos.evt, function(de){
+			$obj.addClass('grabbing');
+			$(document).on(pos.evt, function(de){
 				__gi.s.move = 1;
 
 				if(de.type=='touchmove'){
@@ -149,8 +151,11 @@
 		},
 		showMoveEnd: function(e){
 			let pos = __gi.s.pos, $obj = $(this);
-			$obj.off(pos.evt).removeClass('grabbing');
+			$obj.removeClass('grabbing');
 			setTimeout(()=>{__gi.s.move = 0;}, 50);
+
+			this.releaseCapture && this.releaseCapture();
+			$(document).off(pos.evt);
 
 			// 在缩小状态下，下滑退出
 			if($obj.data('zoom')==0){
@@ -229,7 +234,7 @@
 
 				let html = i.$obj.data('giHTML');
 				i.$obj.ohtml(html);
-				$('img[data-gi-ready]').attr('src', i.src).removeAttr('data-gi-ready');
+				$('img[data-gi-ready]').attr('src', i.src).removeAttr('data-gi-ready').addClass('gia-fadeIn');
 				__gi.ishowBind();
 			}, function(){
 				let cls = i.$obj.addClass('gi-loading gi-failed').attr('class');
