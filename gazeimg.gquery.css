@@ -1,10 +1,12 @@
 /* ==================================================
 // 
-// GazeImg.gQuery.css v1.0.1
+// GazeImg.gQuery.css v1.1.0
 // (c) 2020-present, JU Chengren (Ganxiaozhe)
 //
 // Licensed GPLv3 for open source use
 // or GazeImg Commercial License for commercial use
+//
+// gquery.net/plugins/gazeimg
 //
 // ================================================*/
 
@@ -33,13 +35,25 @@ body.gi-nobar {overflow: hidden!important;}
 .gazeimg-bg, .gazeimg-inner {position: absolute;top: 0;left: 0;width:100%;height:100%;}
 .gazeimg-bg {background: rgb(0,0,0);opacity: 0.85;transition: opacity 0.35s;}
 .gazeimg-inner {padding: 50px 0;animation: gia-zoomIn 0.5s;}
-.gazeimg-stage {
-	position: relative;width: 100%;height: 100%;
+
+.gazeimg-nav {
+	position: absolute;top: 0;left: 0;height: 50px;width: 100%;
+	display: flex;align-items: center;font-size: 13px;color: #fff;
+}
+.gazeimg-nav .gazeimg-pages {padding: 12px;}
+
+.gazeimg-stage {width: 100%;height: 100%;display: flex;flex-direction: column;flex-wrap: wrap;}
+.gazeimg-slide {
+	position: absolute;top: 0;left: 0;width: 100%;height: 100%;
 	display: flex;justify-content: center;align-items: center;
+	transition: all 0.3s ease;
 }
 .gazeimg-content {
 	position: absolute;width:52px;height:52px;overflow: visible;
 	transform-origin: center;transition: all 0.3s ease;
+}
+.gazeimg-content .dialog {
+	padding: 12px 20px;background: rgb(250,250,250);color: #222;font-size: 1.1em;
 }
 .gazeimg-content img {
 	width: 100%;height: 100%;max-width: 100%;max-height: 100%;
@@ -48,8 +62,16 @@ body.gi-nobar {overflow: hidden!important;}
 
 .gazeimg-content.zoom-in {cursor: zoom-in;}
 .gazeimg-content.zoom-out {cursor: zoom-out;}
-.gazeimg-content.grab {cursor: grab;}
-.gazeimg-content.grabbing {cursor: grabbing;transition: none;}
+.gazeimg-content.grab, .gazeimg-slide.grab .gazeimg-content {
+	cursor: grab;
+}
+.gazeimg-content.grabbing, .gazeimg-container.grabbing .gazeimg-content {
+	cursor: grabbing;transition: none;
+}
+.gazeimg-container.grabbing .gazeimg-slide {transition: none;}
+
+.gazeimg-container.x-grabbing .gazeimg-slide {display: flex!important;}
+.gazeimg-slide.prev, .gazeimg-slide.next {display: none;}
 
 @keyframes gia-spin {0% {transform:rotate(0);}100% {transform:rotate(360deg);}}
 
