@@ -20,21 +20,20 @@ GazeImg.js 依赖 gQuery v1.4.7 及以上版本。
 
 #### 使用说明
 
-GazeImg.js 通过 `$.fn.extend` 将其方法拓展进 gQuery 原型链，你可以直接通过 gQuery 选择器对单个或多个图片元素进行绑定。对于静态页面，只需引入相关文件即可，在初始化时 GazeImg 会自动检测整个页面中的相关元素。
+GazeImg.js 通过 $.fn.extend 将其方法拓展进 gQuery 原型链，你可以直接通过 gQuery 选择器对单个或多个图片元素进行绑定。对于静态页面，只需引入相关文件即可，在初始化时 GazeImg 会自动检测整个页面中的相关元素。
 
-静态使用只需要为图片加上 `data-gisrc` 属性，在页面引入文件后将自动解析：
+静态使用只需要为图片加上 data-gisrc 属性，在页面引入文件后将自动解析：
 ```html
 <img data-gisrc='/lib/img/icon.png' />
 ```
 
 
-对于没有 `src` 属性的元素，GazeImg 将默认使用 H5 蒙版。所以，若要自定义锚点图片，只需将图片地址填入 `src` 属性即可：
+对于没有 src 属性的元素，GazeImg 将默认使用 H5 蒙版。所以，若要自定义锚点图片，只需将图片地址填入 src 属性即可：
 ```html
 <img data-gisrc='/lib/img/icon.png' src='mask.png' />
 ```
 
-
-同时，若要为放大查看的图片绑定 GazeImg 灯箱，添加属性 `data-gishow` 即可，赋值即可实现图片分组：
+同时，若要为放大查看的图片绑定 GazeImg 灯箱，添加属性 data-gishow 即可：
 ```html
 <img data-gisrc='/lib/img/icon.png' data-gishow />
 ```
@@ -46,6 +45,11 @@ var imgs = ['/lib/img/pay/alipay.jpg', '/lib/img/pay/wechat.jpg', '404.png'];
 $.gazeimg.show(imgs, 1);
 ```
 
+
+对于动态添加的图片，在输出至 DOM 流后执行以下语句即可：
+```javascript
+$('img[data-gisrc]').gazeimg();
+```
 
 对于动态添加的图片，在输出至 DOM 流后执行以下语句即可：
 ```javascript
