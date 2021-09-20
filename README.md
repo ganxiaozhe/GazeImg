@@ -51,11 +51,6 @@ $.gazeimg.show(imgs, 1);
 $('img[data-gisrc]').gazeimg();
 ```
 
-对于动态添加的图片，在输出至 DOM 流后执行以下语句即可：
-```javascript
-$('img[data-gisrc]').gazeimg();
-```
-
 
 此外，gazeimg 方法支持以下参数：
 ```html
