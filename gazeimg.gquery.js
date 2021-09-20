@@ -1,6 +1,6 @@
 // ==================================================
 // 
-// GazeImg.gQuery.js v1.1.0
+// GazeImg.gQuery.js v1.1.6
 // (c) 2020-present, JU Chengren (Ganxiaozhe)
 //
 // Licensed GPLv3 for open source use
@@ -12,7 +12,7 @@
 ;(function($, window, document){
 	'use strict';
 	if(!$){throw new Error('GazeImg.js need gQuery: https://gquery.net/');}
-	console.log('%c GazeImg v1.1.0 %c www.gquery.net/plugins/gazeimg \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
+	console.log('%c GazeImg v1.1.6 %c www.gquery.net/plugins/gazeimg \n','color: #fff; background: #030307; padding:5px 0; margin-top: 1em;','background: #efefef; color: #333; padding:5px 0;');
 
 	let __gi = {
 		s: {close:0, move:0, queue:[], index:0},
@@ -21,6 +21,11 @@
 				let tran = $obj.css('transform').replace(/[^0-9\-,.]/g,'').split(',');
 				tran.length!=6 && (tran = [0,0,0,0,0,0]);
 				return tran.map(v=>parseInt(v));
+			},
+			pxToNum: function(str){
+				return (
+					typeof str === 'string' ? parseInt( str.replace(/[^\d]/g,'') ) : str
+				);
 			}
 		},
 		iloader: function(src){
@@ -28,7 +33,7 @@
 				const image = new Image();
 
 				image.onload = function(){resolve(image);};
-				image.onerror = function(){reject(image);};
+				image.onerror = function(err){reject(err);};
 
 				image.src = src;
 				if(image.complete){resolve(image);}
@@ -38,7 +43,7 @@
 		// ww, wh, ow, oh | w, h, iz
 		isizeCalc: function(opts){
 			for(let k in opts){
-				isNaN(opts[k]) && ( opts[k] = parseInt(opts[k].replace('px','')) );
+				isNaN(opts[k]) && typeof opts[k]=='string' && ( opts[k] = parseInt(opts[k].replace('px','')) );
 			}
 			opts.w = opts.ow, opts.h = opts.oh;
 			// 是否放大
@@ -69,16 +74,23 @@
 				this.removeAttribute('data-gishow');
 				this.classList.add('gi-click');
 			}).on('click', function(){
-				let im = {i:this, $i:$(this), arr:[], idx:0};
-				im.arr.push( im.$i.attr('src') );
+				let im = {
+					i:this, $i:$(this), arr:[], idx:0,
+					src:$(this).attr('src'), title:$(this).attr('data-title')||''
+				};
+				im.arr.push({src:im.src, title:im.title});
 
 				// 组别处理
 				im.group = im.$i.attr('data-gigp');
 				$(`img[data-gigp="${im.group}"`).each(function(idx){
 					// 清空数组
 					idx==0 && (im.arr.length=0);
+					let gim = {
+						src:this.getAttribute('src'),
+						title:this.getAttribute('data-title')||''
+					};
 
-					im.arr.push( this.getAttribute('src') )
+					im.arr.push(gim);
 					im.i == this && (im.idx = idx);
 				});
 
@@ -88,23 +100,65 @@
 		show: function(arr, idx){
 			let t = {};
 			idx || (idx=0);
+
+			arr = arr.map(v=>{
+				if(typeof v!=='object'){return {src:v, title:''};}
+				return v;
+			});
 			__gi.s.queue = arr;
 			__gi.s.index = idx;
 
 			t.stage = "<div class='gazeimg-container'>"+
 				"<div class='gazeimg-bg'></div>"+
 				"<div class='gazeimg-inner'>"+
-					"<div class='gazeimg-nav'><div class='gazeimg-pages'>1 / 1</div></div>"+
+					"<div class='gazeimg-nav'><div class='gazeimg-pages'>1 / 1</div>"+
+						"<div class='gazeimg-opts'>"+
+							"<span class='gazeimg-opt spin'><i class='gazeimg-opt-spin'></i></span>"+
+							"<span class='gazeimg-opt close'><i class='gazeimg-opt-close'></i></span>"+
+						"</div>"+
+					"</div>"+
 					"<div class='gazeimg-stage'>"+
 						"<div class='gazeimg-slide current'><div class='gazeimg-content'><div class='loader'></div></div></div>"+
 					"</div>"+
+					"<div class='gazeimg-footer'><div class='gazeimg-title'></div></div>"+
 				"</div>"+
 			"</div>";
 			$('body').append(t.stage).addClass('gi-nobar');
 
+			__gi.navUpdate();
 			__gi.sprepare();
 			__gi.sbind();
 			__gi.sloader($('.gazeimg-slide.current > .gazeimg-content'), arr[idx]);
+
+			// dom bind
+			$('.gazeimg-opt').on('click', function(e){
+				e.stopPropagation();
+				let $opt=$(this), act=this.className.replace('gazeimg-opt ', '');
+				let $wrp=$opt.parent(), $img=$('.gazeimg-slide.current > .gazeimg-content > img');
+
+				if($wrp.hasClass('disabled')){return false;}
+				$wrp.addClass('disabled').wait(500).removeClass('disabled');
+
+				switch(act){
+					case 'close':__gi.showClose();break;
+					case 'spin':
+						let cls = '';
+						if($img.hasClass('spin1')){
+							cls = 'spin2';
+						} else if($img.hasClass('spin2')) {
+							cls = 'spin3';
+						} else if($img.hasClass('spin3')) {
+							cls = 'spin4';
+						} else {
+							cls = 'spin1';
+						}
+						$img.removeClass('spin1 spin2 spin3 spin4').addClass(cls);
+						if(cls=='spin4'){
+							$img.wait(250).css('transition','none').removeClass('spin4').wait(250).css('transition','');
+						}
+						break;
+				}
+			});
 		},
 		sprepare: function(){
 			if(__gi.s.queue.length<2){return;}
@@ -127,7 +181,7 @@
 
 			$('.gazeimg-container').removeClass('grabbing x-grabbing');
 		},
-		sloader: function($obj, src){
+		sloader: function($obj, item){
 			let t = {};
 			$obj.html("<div class='loader'></div>");
 
@@ -135,7 +189,7 @@
 			t.$stage = $('.gazeimg-stage');
 			t.stageW = t.$stage.width();t.stageH = t.$stage.height();
 
-			__gi.iloader(src).then(function(img){
+			__gi.iloader(item.src).then(function(img){
 				// 计算处理
 				let icalc = __gi.isizeCalc({
 					ww: t.stageW, wh: t.stageH,
@@ -148,7 +202,7 @@
 					iW:icalc.w, iH:icalc.h,
 					inW:icalc.ow, inH:icalc.oh,
 					isZoom: icalc.iz, zoom: 0
-				}).html(`<img src='${src}'/>`).css({
+				}).html(`<img src='${item.src}'/>`).css({
 					width:`${icalc.w}px`, height:`${icalc.h}px`
 				}).addClass(t.cls);
 				$obj.find('img').on('mousedown', function(e){e.preventDefault();});
@@ -156,6 +210,7 @@
 				$obj.data({
 					isZoom:0, zoom:0
 				}).css({width:'auto'}).html(`<div class='dialog'>图片加载失败！</div>`);
+				throw new Error(err);
 			});
 		},
 		sbind: function(){
@@ -167,7 +222,7 @@
 				__gi.s.close++;
 				setTimeout(()=>{
 					__gi.s.close == 1 && __gi.showClose();
-				},50);
+				}, 50);
 			});
 
 			$('.gazeimg-container').on({
@@ -306,7 +361,7 @@
 
 			// 向右切换 next
 			if(pos.xperc<0){
-				__gi.s.index++;
+				__gi.s.index++;__gi.navUpdate();
 				$obj.css({transform: `translate(${-pos.ww}px, 0px)`});
 				$next.css({transform: `translate(0px, 0px)`});
 
@@ -319,7 +374,7 @@
 			}
 
 			// 向左切换 prev
-			__gi.s.index--;
+			__gi.s.index--;__gi.navUpdate();
 			$obj.css({transform: `translate(${pos.ww}px, 0px)`});
 			$prev.css({transform: `translate(0px, 0px)`});
 
@@ -328,6 +383,11 @@
 				$prev.removeClass('prev').addClass('current');
 				__gi.sprepare();
 			}, 300);
+			return;
+		},
+		navUpdate: function(){
+			let item = __gi.s.queue[__gi.s.index];
+			$('.gazeimg-title').text(item.title);
 		},
 		showMove: function(e){
 			let $obj = $(this), pos = {};
@@ -394,7 +454,7 @@
 				si.$p = si.$i.parent();
 
 				si.src = si.$i.attr('data-gisrc');
-				si.$i.attr('data-gi-ready',1).removeAttr('data-gisrc');
+				si.$i.attr('data-gi-ready', 1).removeAttr('data-gisrc');
 				opts.class && (si.cls = opts.class);
 
 				// 内置尺寸
@@ -444,7 +504,10 @@
 
 			let i = {$obj: $(this)};
 			i.src = i.$obj.removeAttr('data-gi-prepare').data('giSRC');
-			i.w = i.$obj.css('width'), i.h = i.$obj.css('height');
+			/*
+			i.w = __gi.fn.pxToNum(i.$obj.css('width')), i.h = __gi.fn.pxToNum(i.$obj.css('height'));
+			i.w = i.w<2 ? 'auto' : i.w+'px', i.h = i.h<2 ? 'auto' : i.h+'px';
+			*/
 
 			__gi.iloader(i.src).then(function(){
 				// 图片蒙版
@@ -455,9 +518,7 @@
 				// HTML 蒙版
 				let html = i.$obj.data('giHTML');
 				i.$obj.ohtml(html);
-				$('img[data-gi-ready]').css({
-					width:i.w, height:i.h
-				}).attr('src', i.src).removeAttr('data-gi-ready').addClass('gia-fadeIn');
+				$('img[data-gi-ready]').attr('src', i.src).removeAttr('data-gi-ready').addClass('gia-fadeIn');
 				__gi.ishowBind();
 			}, function(){
 				let cls = i.$obj.addClass('gi-loading gi-failed').attr('class');
@@ -469,12 +530,13 @@
 	// 初始化
 	$('img[data-gisrc]').gazeimg();
 
-
-
 	// 暴露接口
 	$.extend({
 		gazeimg: {
-			show: __gi.show
+			show: __gi.show,
+			showBind: __gi.ishowBind,
+			loader: __gi.iloader,
+			sizeCalc: __gi.isizeCalc
 		}
 	});
 })(gQuery, window, document);
