@@ -4,6 +4,8 @@
 
 该插件由 Ganxiaozhe 开发，除图片锚点外，另支持 H5 蒙版锚点；支持 Ajax/Fetch 等动态加载；支持图片灯箱。
 
+Website: [https://www.gquery.net/plugins/gazeimg/](https://www.gquery.net/plugins/gazeimg/)
+
 
 #### 安装教程
 
@@ -25,20 +27,31 @@ GazeImg.js 通过 `$.fn.extend` 将其方法拓展进 gQuery 原型链，你可�
 <img data-gisrc='/lib/img/icon.png' />
 ```
 
+
 对于没有 `src` 属性的元素，GazeImg 将默认使用 H5 蒙版。所以，若要自定义锚点图片，只需将图片地址填入 `src` 属性即可：
 ```html
 <img data-gisrc='/lib/img/icon.png' src='mask.png' />
 ```
 
-同时，若要为放大查看的图片绑定 GazeImg 灯箱，添加属性 `data-gishow` 即可：
+
+同时，若要为放大查看的图片绑定 GazeImg 灯箱，添加属性 `data-gishow` 即可，赋值即可实现图片分组：
 ```html
 <img data-gisrc='/lib/img/icon.png' data-gishow />
 ```
+
+
+若要单独使用 GazeImg 灯箱，调用 `$.gazeimg.show(images:Array [, index:Number])`：
+```javascript
+var imgs = ['/lib/img/pay/alipay.jpg', '/lib/img/pay/wechat.jpg', '404.png'];
+$.gazeimg.show(imgs, 1);
+```
+
 
 对于动态添加的图片，在输出至 DOM 流后执行以下语句即可：
 ```javascript
 $('img[data-gisrc]').gazeimg();
 ```
+
 
 此外，gazeimg 方法支持以下参数：
 ```html
