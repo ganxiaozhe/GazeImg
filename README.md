@@ -2,9 +2,9 @@
 
 #### 介绍
 
-该插件由 Ganxiaozhe 开发，除图片锚点外，另支持 H5 蒙版锚点；支持 Ajax/Fetch 等动态加载；支持图片灯箱。
+该插件由 Ganxiaozhe 开发，除图片锚点外，另支持 H5 蒙版锚点；支持 Ajax/Fetch 等动态加载；支持图片灯箱。GazeImg 自 1.2.0 起使用 `IntersectionObserver` 而非 `onScroll`。
 
-Website: [https://www.gquery.net/plugins/gazeimg/](https://www.gquery.net/plugins/gazeimg/)
+Website: [https://www.gquery.cn/plugins/gazeimg/](https://www.gquery.cn/plugins/gazeimg/)
 
 
 #### 安装教程
